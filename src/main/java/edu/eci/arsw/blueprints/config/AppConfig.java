@@ -11,10 +11,6 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan(basePackages = "edu.eci.arsw.blueprints")
 public class AppConfig {
 
-    @Bean
-    public BlueprintsPersistence blueprintsPersistence(){
-        return new InMemoryBlueprintPersistence();
-    }
 
     @Bean
     public BlueprintsServices blueprintsServices(){

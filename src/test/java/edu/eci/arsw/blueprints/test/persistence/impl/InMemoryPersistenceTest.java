@@ -12,6 +12,8 @@ import edu.eci.arsw.blueprints.persistence.BlueprintPersistenceException;
 import edu.eci.arsw.blueprints.persistence.impl.InMemoryBlueprintPersistence;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.junit.Assert;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -65,10 +67,38 @@ public class InMemoryPersistenceTest {
         catch (BlueprintPersistenceException ex){
             
         }
-                
-        
+
     }
 
+    @Test
+    public void shouldSaveandGetBueprint() throws BlueprintPersistenceException, BlueprintNotFoundException {
+        InMemoryBlueprintPersistence ibpp=new InMemoryBlueprintPersistence();
+        Point[] pts=new Point[]{new Point(0, 0),new Point(10, 10)};
+        Blueprint bp=new Blueprint("Juanito", "Prueba1", pts);
+        ibpp.saveBlueprint(bp);
+        Blueprint retrieved = ibpp.getBlueprint("Juanito", "Prueba1");
+        Assert.assertNotNull(retrieved);
+        Assert.assertEquals("Juanito", retrieved.getAuthor());
+        Assert.assertEquals("Prueba1", retrieved.getName());
+    }
+
+    @Test
+    public void shouldGetByAuthor() throws Exception{
+        InMemoryBlueprintPersistence ibpp=new InMemoryBlueprintPersistence();
+        Point[] pts=new Point[]{new Point(0, 0),new Point(10, 10)};
+        Point[] pts2=new Point[]{new Point(0, 0),new Point(20, 20)};
+        Blueprint bp=new Blueprint("Juanito", "Prueba1", pts);
+        Blueprint bp2=new Blueprint("Juanito", "Prueba2", pts2);
+        ibpp.saveBlueprint(bp);
+        ibpp.saveBlueprint(bp2);
+        Assert.assertEquals(2, ibpp.getBlueprintsByAuthor("Juanito").size());
+    }
+
+    @Test(expected = BlueprintNotFoundException.class)
+    public void shouldThrowExceptionWhenBlueprintDoesNotExist() throws BlueprintNotFoundException {
+        InMemoryBlueprintPersistence ibpp=new InMemoryBlueprintPersistence();
+        ibpp.getBlueprint("Juanito", "Prueba1");
+    }
 
     
 }

@@ -10,17 +10,21 @@ import edu.eci.arsw.blueprints.model.Point;
 import edu.eci.arsw.blueprints.persistence.BlueprintNotFoundException;
 import edu.eci.arsw.blueprints.persistence.BlueprintPersistenceException;
 import edu.eci.arsw.blueprints.persistence.BlueprintsPersistence;
-import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
  * @author hcadavid
  */
-@Repository
+
 public class InMemoryBlueprintPersistence implements BlueprintsPersistence{
+
 
     private final Map<Tuple<String,String>,Blueprint> blueprints=new HashMap<>();
 
@@ -44,9 +48,30 @@ public class InMemoryBlueprintPersistence implements BlueprintsPersistence{
 
     @Override
     public Blueprint getBlueprint(String author, String bprintname) throws BlueprintNotFoundException {
-        return blueprints.get(new Tuple<>(author, bprintname));
+        Blueprint toReturn =  blueprints.get(new Tuple<>(author, bprintname));
+        if (toReturn == null){
+            throw new BlueprintNotFoundException("The given blueprint does not exist: "+author+" "+bprintname);
+        }
+        return toReturn;
+
     }
 
-    
-    
+    @Override
+    public Set<Blueprint> getAllBlueprints() {
+        return new HashSet<>(blueprints.values());
+    }
+
+    @Override
+    public Set<Blueprint> getBlueprintsByAuthor(String author) throws BlueprintNotFoundException {
+        Set<Blueprint> toReturn =  blueprints.values().stream()
+                .filter(bp -> bp.getAuthor().equals(author))
+                .collect(Collectors.toSet());
+        if(toReturn.isEmpty()){
+            throw new BlueprintNotFoundException("No se encontraron Planos para el autor: "+author);
+        }
+        return toReturn;
+    }
+
+
+
 }

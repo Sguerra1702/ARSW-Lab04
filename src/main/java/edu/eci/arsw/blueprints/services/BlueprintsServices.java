@@ -22,7 +22,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class BlueprintsServices {
 
-    
+    @Autowired
+    BlueprintsPersistence bpPersistence;
+
     public void addNewBlueprint(Blueprint bp){
         
     }
@@ -30,7 +32,7 @@ public class BlueprintsServices {
     public Set<Blueprint> getAllBlueprints(){
         return null;
     }
-    
+
     /**
      * 
      * @param author blueprint's author
