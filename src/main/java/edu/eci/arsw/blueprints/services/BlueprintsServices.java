@@ -5,9 +5,11 @@
  */
 package edu.eci.arsw.blueprints.services;
 
+import edu.eci.arsw.blueprints.filters.BlueprintFilter;
 import edu.eci.arsw.blueprints.model.Blueprint;
 import edu.eci.arsw.blueprints.model.Point;
 import edu.eci.arsw.blueprints.persistence.BlueprintNotFoundException;
+import edu.eci.arsw.blueprints.persistence.BlueprintPersistenceException;
 import edu.eci.arsw.blueprints.persistence.BlueprintsPersistence;
 
 import java.util.Collections;
@@ -18,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Service;
@@ -28,31 +31,31 @@ import org.springframework.stereotype.Service;
  */
 
 
-@SpringBootApplication
-public class BlueprintsAplication {
-    public static void main(String[] args) {
-        SpringApplication.run(BlueprintsAplication.class, args);
-    }
-
-    
-}
 
 
 @Service
-class BlueprintsServices {
+public class BlueprintsServices {
 
     @Autowired
     BlueprintsPersistence bpPersistence;
 
+
+    @Autowired
+    BlueprintsPersistence bpp;
+
+    @Autowired
+    @Qualifier("RedundancyFilter")
+    BlueprintFilter blueprintFilter;
+
     private final Map<String , Set<String>> blueprints = new HashMap<>();
 
-    public void addNewBlueprint(String author, String Blueprint){
-        blueprints.computeIfAbsent(author,k -> new HashSet<>()).add(Blueprint);
+    public void addNewBlueprint(Blueprint blueprint) throws BlueprintPersistenceException{
+        bpp.saveBlueprint(blueprint);
         
     }
     
     public Set<Blueprint> getAllBlueprints(){
-        return null;
+        return bpp.getAllBlueprints();
     }
 
     /**
@@ -62,8 +65,8 @@ class BlueprintsServices {
      * @return the blueprint of the given name created by the given author
      * @throws BlueprintNotFoundException if there is no such blueprint
      */
-    public Optional <String > getBlueprint(String author,String Blueprint) throws BlueprintNotFoundException{
-        return blueprints.getOrDefault(author, Collections.emptySet()).stream().filter(bpPersistence -> bpPersistence.equals(Blueprint)).findFirst();
+    public Blueprint getBlueprint(String author,String name) throws BlueprintNotFoundException{
+        return blueprintFilter.filterBlueprint(bpp.getBlueprint(author, name));
     }
     
     /**
@@ -72,8 +75,8 @@ class BlueprintsServices {
      * @return all the blueprints of the given author
      * @throws BlueprintNotFoundException if the given author doesn't exist
      */
-    public Set<String> getBlueprintsByAuthor(String author) throws BlueprintNotFoundException{
-        return blueprints.getOrDefault(author,Collections.emptySet());
-    }
+    public Set<Blueprint> getBlueprintsByAuthor(String author) throws BlueprintNotFoundException{
+        return blueprintFilter.filterBlueprints(bpp.getBlueprintsByAuthor(author));
     
+}
 }

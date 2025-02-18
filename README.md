@@ -34,3 +34,33 @@ En este ejercicio se va a construír un modelo de clases para la capa lógica de
 	* (B) Filtrado de submuestreo: suprime 1 de cada 2 puntos del plano, de manera intercalada.
 
 5. Agrege las pruebas correspondientes a cada uno de estos filtros, y pruebe su funcionamiento en el programa de prueba, comprobando que sólo cambiando la posición de las anotaciones -sin cambiar nada más-, el programa retorne los planos filtrados de la manera (A) o de la manera (B). 
+
+
+
+### Desarrollo Laboratorio
+
+1) Se agregaron las dependencias necesarias en el POM, para trabajar con inyección de dependencias y anotaciones de Spring
+
+![](img/1.png)
+
+
+2) Se completaron los metodos getBlueprint() y getBlueprintsByAuthor()
+
+En el metodo getBlueprint busca un blueprint especifico en la tupla
+
+En el metodo getBlueprintsByAuthor, devuelve el conjunto de blueprints que concuerdan con el autor
+
+![](img/2.png)
+
+
+y aqui estan las pruebas 
+
+
+![](img/3.png)
+
+
+3) Se desarrolla el programa en la clase App.java , junto con sus importaciones necesarias para su correcto funcionamiento
+
+![](img/4.png)
+
+![](img/5.png)

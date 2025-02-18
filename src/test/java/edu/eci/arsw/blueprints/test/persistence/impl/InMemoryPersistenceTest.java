@@ -10,8 +10,7 @@ import edu.eci.arsw.blueprints.model.Point;
 import edu.eci.arsw.blueprints.persistence.BlueprintNotFoundException;
 import edu.eci.arsw.blueprints.persistence.BlueprintPersistenceException;
 import edu.eci.arsw.blueprints.persistence.impl.InMemoryBlueprintPersistence;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,7 +32,7 @@ public class InMemoryPersistenceTest {
         ibpp.saveBlueprint(bp0);
         
         Point[] pts=new Point[]{new Point(0, 0),new Point(10, 10)};
-        Blueprint bp=new Blueprint("john", "thepaint",pts);
+        Blueprint bp=new Blueprint("juanito", "prueba",pts);
         
         ibpp.saveBlueprint(bp);
         
@@ -49,7 +48,7 @@ public class InMemoryPersistenceTest {
         InMemoryBlueprintPersistence ibpp=new InMemoryBlueprintPersistence();
         
         Point[] pts=new Point[]{new Point(0, 0),new Point(10, 10)};
-        Blueprint bp=new Blueprint("john", "thepaint",pts);
+        Blueprint bp=new Blueprint("juanito", "prueba",pts);
         
         try {
             ibpp.saveBlueprint(bp);
@@ -58,7 +57,7 @@ public class InMemoryPersistenceTest {
         }
         
         Point[] pts2=new Point[]{new Point(10, 10),new Point(20, 20)};
-        Blueprint bp2=new Blueprint("john", "thepaint",pts2);
+        Blueprint bp2=new Blueprint("juanito", "prueba",pts2);
 
         try{
             ibpp.saveBlueprint(bp2);
@@ -100,5 +99,39 @@ public class InMemoryPersistenceTest {
         ibpp.getBlueprint("Juanito", "Prueba1");
     }
 
-    
+    @Test
+    public void getBlueprintTest() throws BlueprintPersistenceException, BlueprintNotFoundException {
+        InMemoryBlueprintPersistence ibpp = new InMemoryBlueprintPersistence();
+
+        Point[] pts = new Point[]{new Point(0, 0), new Point(10, 10)};
+        Blueprint bp = new Blueprint("juanito", "prueba", pts);
+        ibpp.saveBlueprint(bp);
+
+        Blueprint retrievedBp = ibpp.getBlueprint("juanito", "prueba");
+
+        assertNotNull("Loading a previously stored blueprint returned null.", retrievedBp);
+        assertEquals("Loading a previously stored blueprint returned a different blueprint.", bp, retrievedBp);
+    }
+
+    @Test
+    public void getBlueprintsByAuthorTest() throws BlueprintPersistenceException, BlueprintNotFoundException {
+        InMemoryBlueprintPersistence ibpp = new InMemoryBlueprintPersistence();
+
+        Point[] pts1 = new Point[]{new Point(0, 0), new Point(10, 10)};
+        Blueprint bp1 = new Blueprint("juanito", "prueba1", pts1);
+        ibpp.saveBlueprint(bp1);
+
+        Point[] pts2 = new Point[]{new Point(20, 20), new Point(30, 30)};
+        Blueprint bp2 = new Blueprint("juanito", "prueba2", pts2);
+        ibpp.saveBlueprint(bp2);
+
+        Point[] pts3 = new Point[]{new Point(40, 40), new Point(50, 50)};
+        Blueprint bp3 = new Blueprint("juanito", "prueba3", pts3);
+        ibpp.saveBlueprint(bp3);
+
+        assertEquals("The number of blueprints by author is incorrect.", 3, ibpp.getBlueprintsByAuthor("juanito").size());
+        assertTrue("The list of blueprints by author does not contain the expected blueprint.", ibpp.getBlueprintsByAuthor("juanito").contains(bp1));
+        assertTrue("The list of blueprints by author does not contain the expected blueprint.", ibpp.getBlueprintsByAuthor("juanito").contains(bp2));
+        assertTrue("The list of blueprints by author contains an unexpected blueprint.", ibpp.getBlueprintsByAuthor("juanito").contains(bp3));
+    }
 }
