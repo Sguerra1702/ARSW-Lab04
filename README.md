@@ -39,6 +39,12 @@ En este ejercicio se va a construír un modelo de clases para la capa lógica de
 
 ### Desarrollo Laboratorio
 
+Aqui esta el desarrollo del ejercicio (taller introducción al manejo de spring y la configuración basada en anotaciones)
+
+```
+https://github.com/andres3455/ARSW_LAB4_Ejercicio.git
+```
+
 1) Se agregaron las dependencias necesarias en el POM, para trabajar con inyección de dependencias y anotaciones de Spring
 
 ![](img/1.png)
