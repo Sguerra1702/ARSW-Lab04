@@ -70,3 +70,20 @@ y aqui estan las pruebas
 ![](img/4.png)
 
 ![](img/5.png)
+
+4) Primero, se crearon los filtros por redundancia y por submuestreo, se crearon las interfaces y las implementaciones de los filtros
+![](img/6.png)
+![](img/7.png)
+![](img/8.png)
+5) Se crearon 3 pruebas unitarias para probar los filtros y su correcto funcionamiento
+![](img/9.png)
+Algo interesante que se puede notar es que al ejecutar por primera vez las pruebas, estas fallan así:
+ShouldApplyRedundancyFilter:
+![](img/10.png)
+ShouldFilterBlueprintsByAuthor:
+![](img/11.png)
+Los prints que se ven en las pruebas indican que al hacer las comparaciones de los puntos estas se hacen apuntando hacia un espacio de memoria.
+Esto se soluciona sobreescribiendo el metodo equals en la clase Point, para que compare los puntos por sus coordenadas y no por su espacio de memoria
+![](img/12.png)
+Al ejecutar las pruebas después de hacer estos cambios, vemos que estas pasan correctamente.
+![](img/13.png)

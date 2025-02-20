@@ -37,15 +37,11 @@ import org.springframework.stereotype.Service;
 public class BlueprintsServices {
 
     @Autowired
-    BlueprintsPersistence bpPersistence;
-
-
-    @Autowired
-    BlueprintsPersistence bpp;
+    public BlueprintsPersistence bpp;
 
     @Autowired
     @Qualifier("RedundancyFilter")
-    BlueprintFilter blueprintFilter;
+    public BlueprintFilter blueprintFilter;
 
     private final Map<String , Set<String>> blueprints = new HashMap<>();
 
@@ -77,6 +73,5 @@ public class BlueprintsServices {
      */
     public Set<Blueprint> getBlueprintsByAuthor(String author) throws BlueprintNotFoundException{
         return blueprintFilter.filterBlueprints(bpp.getBlueprintsByAuthor(author));
-    
-}
+    }
 }

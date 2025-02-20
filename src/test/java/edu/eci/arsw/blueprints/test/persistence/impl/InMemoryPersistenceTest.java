@@ -5,6 +5,8 @@
  */
 package edu.eci.arsw.blueprints.test.persistence.impl;
 
+import edu.eci.arsw.blueprints.filters.RedundancyFilter;
+import edu.eci.arsw.blueprints.filters.SubsamplingFilter;
 import edu.eci.arsw.blueprints.model.Blueprint;
 import edu.eci.arsw.blueprints.model.Point;
 import edu.eci.arsw.blueprints.persistence.BlueprintNotFoundException;
@@ -12,8 +14,12 @@ import edu.eci.arsw.blueprints.persistence.BlueprintPersistenceException;
 import edu.eci.arsw.blueprints.persistence.impl.InMemoryBlueprintPersistence;
 
 
+import edu.eci.arsw.blueprints.services.BlueprintsServices;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Set;
+
 import static org.junit.Assert.*;
 
 /**
@@ -21,6 +27,7 @@ import static org.junit.Assert.*;
  * @author hcadavid
  */
 public class InMemoryPersistenceTest {
+    private BlueprintsServices blueprintsServices;
     
     @Test
     public void saveNewAndLoadTest() throws BlueprintPersistenceException, BlueprintNotFoundException{
@@ -133,5 +140,65 @@ public class InMemoryPersistenceTest {
         assertTrue("The list of blueprints by author does not contain the expected blueprint.", ibpp.getBlueprintsByAuthor("juanito").contains(bp1));
         assertTrue("The list of blueprints by author does not contain the expected blueprint.", ibpp.getBlueprintsByAuthor("juanito").contains(bp2));
         assertTrue("The list of blueprints by author contains an unexpected blueprint.", ibpp.getBlueprintsByAuthor("juanito").contains(bp3));
+    }
+
+    @Test
+    public void shouldApplyRedundancyFilter() throws Exception {
+        InMemoryBlueprintPersistence ibpp = new InMemoryBlueprintPersistence();
+        blueprintsServices = new BlueprintsServices();
+        blueprintsServices.bpp = ibpp;
+        blueprintsServices.blueprintFilter = new RedundancyFilter(); // Usamos el filtro de redundancia
+
+        Point[] pts = new Point[]{new Point(0, 0), new Point(10, 10), new Point(10, 10), new Point(20, 20)};
+        Blueprint bp = new Blueprint("author1", "redundantBlueprint", pts);
+        blueprintsServices.addNewBlueprint(bp);
+
+        Blueprint filteredBlueprint = blueprintsServices.getBlueprint("author1", "redundantBlueprint");
+        System.out.println("Puntos antes del filtrado: " + bp.getPoints());
+        System.out.println("Puntos después del filtrado: " + filteredBlueprint.getPoints());
+        assertEquals("El filtro de redundancia no eliminó los puntos duplicados correctamente.",
+                3, filteredBlueprint.getPoints().size());
+    }
+
+    @Test
+    public void shouldApplySubsamplingFilter() throws Exception {
+        InMemoryBlueprintPersistence ibpp = new InMemoryBlueprintPersistence();
+        blueprintsServices = new BlueprintsServices();
+        blueprintsServices.bpp = ibpp;
+        blueprintsServices.blueprintFilter = new SubsamplingFilter(); // Usamos el filtro de submuestreo
+
+        Point[] pts = new Point[]{new Point(0, 0), new Point(10, 10), new Point(20, 20), new Point(30, 30)};
+        Blueprint bp = new Blueprint("author1", "subsampledBlueprint", pts);
+        blueprintsServices.addNewBlueprint(bp);
+
+        Blueprint filteredBlueprint = blueprintsServices.getBlueprint("author1", "subsampledBlueprint");
+
+        assertEquals("El filtro de submuestreo no redujo correctamente los puntos.",
+                2, filteredBlueprint.getPoints().size());
+    }
+
+    @Test
+    public void shouldFilterBlueprintsByAuthor() throws Exception {
+        InMemoryBlueprintPersistence ibpp = new InMemoryBlueprintPersistence();
+        blueprintsServices = new BlueprintsServices();
+        blueprintsServices.bpp = ibpp;
+        blueprintsServices.blueprintFilter = new RedundancyFilter(); // Aplicamos un filtro
+
+        Point[] pts1 = new Point[]{new Point(0, 0), new Point(10, 10), new Point(10, 10)};
+        Blueprint bp1 = new Blueprint("author2", "bp1", pts1);
+
+        Point[] pts2 = new Point[]{new Point(20, 20), new Point(30, 30), new Point(30, 30)};
+        Blueprint bp2 = new Blueprint("author2", "bp2", pts2);
+
+        blueprintsServices.addNewBlueprint(bp1);
+        blueprintsServices.addNewBlueprint(bp2);
+
+        Set<Blueprint> filteredBlueprints = blueprintsServices.getBlueprintsByAuthor("author2");
+
+        assertEquals("No se aplicó correctamente el filtro a los planos del autor.", 2, filteredBlueprints.size());
+        for (Blueprint bp : filteredBlueprints) {
+            assertEquals("El filtro de redundancia no se aplicó correctamente.",
+                    2, bp.getPoints().size());
+        }
     }
 }
